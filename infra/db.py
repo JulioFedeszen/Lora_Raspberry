@@ -11,12 +11,18 @@ class Database:
         )
         self.cursor = self.conn.cursor()
 
-    def execute_ddl_false(self, query):
-        self.cursor.execute(query)
+    def execute_ddl_false(self, query, params=None):
+        if params:
+            self.cursor.execute(query, params)
+        else:
+            self.cursor.execute(query)
         self.conn.commit()
         
-    def execute_ddl_true(self, query):
-        self.cursor.execute(query)
+    def execute_ddl_true(self, query, params=None):
+        if params:
+            self.cursor.execute(query, params)
+        else:
+            self.cursor.execute(query)
         return self.cursor.fetchall()
         
     def close(self):
