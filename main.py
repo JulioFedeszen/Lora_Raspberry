@@ -15,12 +15,13 @@ class Main:
 
             
 if __name__ == "__main__":
-    Logger.info("Raspberry Pi pronto para receber via LoRa UART")
+    logger = Logger()
+    logger.info("Raspberry Pi pronto para receber via LoRa UART")
     
     try:
         Main().run()
     except KeyboardInterrupt:
-        Logger.warn("Encerrando o programa...")
+        logger.warn("Encerrando o programa...")
     finally:
         GPIO.cleanup()
         Database().close()
