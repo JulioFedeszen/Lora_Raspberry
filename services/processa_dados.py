@@ -74,6 +74,11 @@ class ProcessaDados:
             msg = self._lora.read_message()
             if msg:
                 try:
+                    msg = msg.strip()
+                    if not msg:
+                        self._log.warn("Mensagem vazia recebida via LoRa")
+                        continue
+
                     pacote = json.loads(msg)
                     assunto = pacote.get("assunto", "").strip()
                     identificador_no = pacote.get("no", "").strip()
@@ -81,12 +86,10 @@ class ProcessaDados:
                     resultado = self._acoes_db.buscar_no_por_id(identificador_no, self._coletor_id)
 
                     if assunto == "coleta":
-
                         if not self._valida.valida_insert(dados):
-                            self._log.info("Dados incompletos ou inválidos:", dados)
+                            self._log.info(f"Dados incompletos ou inválidos: {dados}")
                             self._lora.send_nok()
                             continue
-
 
                         if resultado:
                             no_id = resultado[0]
@@ -100,14 +103,14 @@ class ProcessaDados:
                         irriga = self._define_irrigacao.definir_irrigacao(umi_solo, chuva)
                         if irriga:
                             self._lora.send_turn_on_irrigation(no_id)
-                            
+
                     elif assunto == "irrigacao":
                         if resultado:
                             no_id = resultado[0]
                             no_atuante = dados.get("no_atuante")
                             hora_inicio = dados.get("hora_inicio")
                             hora_fim = dados.get("hora_fim")
-                            
+
                             if hora_fim is not None:
                                 self._acoes_db.atualizar_fim_irrigacao(no_id, hora_fim)
                             else:
@@ -117,12 +120,11 @@ class ProcessaDados:
                                     inicio=hora_inicio,
                                     fim=None
                                 )
-                                
- 
                     else:
                         self._log.warn(f"Nó '{identificador_no}' não encontrado")
-                except json.JSONDecodeError:
-                    self._log.error("JSON inválido:", msg)
 
-                self._log.info("Recebido:", msg)
+                except json.JSONDecodeError:
+                    self._log.error(f"JSON inválido: {msg}")
+
+                self._log.info(f"Recebido: {msg}")
             time.sleep(0.1)
