@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import serial
 import json
-
+from utils.logger import Logger
 
 class Lora:
     def __init__(self, serial_port="/dev/serial0", baudrate=9600, timeout=1,
@@ -11,7 +11,8 @@ class Lora:
         self._m1_pin = m1_pin
         self._aux_pin = aux_pin
         self._coletor_id = "96741762-1d52-4558-8d95-232b85d5f6aa"
-
+        self._log = Logger()
+        
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self._m0_pin, GPIO.OUT)
         GPIO.setup(self._m1_pin, GPIO.OUT)
